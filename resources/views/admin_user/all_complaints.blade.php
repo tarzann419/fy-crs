@@ -23,7 +23,7 @@
                 @endif
                 
                 <div class="py-12">
-                    @if(count($my_complaints) > 0)
+                    @if(count($complaints) > 0)
                     <table class="min-w-full bg-white border border-gray-300">
                         <thead>
                             <tr>
@@ -35,7 +35,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($my_complaints as $key => $item)
+                            @foreach($complaints as $key => $item)
                             <tr>
                                 <td class="py-2 px-4 border-b">
                                     @if($item->image)
@@ -55,7 +55,7 @@
                                 </td>
 
                                 <!-- Modal for Edit -->
-                                <div class="modal fade" id="editModal{{ $item->id }}" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+                                {{--<div class="modal fade" id="editModal{{ $item->id }}" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-centered">
                                         <div class="modal-content">
                                             <div class="modal-header">
@@ -86,7 +86,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                </div>--}}
 
                                 <!-- End of Modal for Edit -->
 

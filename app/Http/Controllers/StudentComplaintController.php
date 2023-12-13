@@ -14,14 +14,16 @@ use Illuminate\Support\Facades\Redirect;
 
 class StudentComplaintController extends Controller
 {
-    public function AllComplaints(){
+    public function AllComplaints()
+    {
         $my_complaints = StudentCompl::latest()->get()->where('user_id', Auth::user()->id);
         $category = Category::get();
 
         return view('student.all_complaints', compact('my_complaints', 'category'));
     }
 
-    public function ShowAddComplaintPage(){
+    public function ShowAddComplaintPage()
+    {
         $category = Category::get();
         return view('student.add_complaint', compact('category'));
     }
@@ -33,10 +35,9 @@ class StudentComplaintController extends Controller
             'description' => 'required|max:255',
             'date_of_occurence' => 'required|date',
             'category_id' => 'required',
-            'attachments' => 'required',
-            'attachments.*' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            // 'attachments.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
-    
+
         // new complaint
         $complaint = StudentCompl::create([
             'user_id' => Auth::user()->id,
@@ -45,51 +46,60 @@ class StudentComplaintController extends Controller
             'category_id' => $request->category_id,
             'created_at' => now(),
         ]);
-    
+
         // store images
         $images = [];
         if ($request->has('attachments')) {
             foreach ($request->file('attachments') as $key => $attachment) {
                 $imageName = time() . rand(1, 99) . '.' . $attachment->extension();
                 $attachment->move(public_path('images'), $imageName);
-    
-                $images[] = ['name' => $imageName];
+
+                $images[]['attachments'] = $imageName;
+
+                // $images[] = ['attachments' => $imageName];
             }
-    
+
             // assoc images with the complaint
-            $complaint->images()->createMany($images);
+            foreach ($images as $key => $image) {
+                StudentCompl::create($image);
+            }
+            // $complaint->images()->createMany($images);
         }
-    
+        dd($complaint);
+
         // data for email
         $data = [
             'name' => Auth::user()->name,
             'description' => $request->description,
             'date_of_occurence' => $request->date_of_occurence,
             'category_id' => $request->category_id,
-            'attachments' => $images, // Assuming you want to attach image details to the email
+            // 'attachments' => $images, // if you want to attach image details to the email
         ];
-    
+
         // confirmation email to admin
         Mail::to('admin@gmail.com')->send(new AdminReceivedMail($data));
-    
+
         // confirmation email to user
         Mail::to(Auth::user()->email)->send(new ComplaintSubmittedMail($data));
-    
-        // Redirect to the desired route
-        return redirect()->route('show.all.complaints');
-    }    
 
-    public function UpdateComplaint(Request $request, $id){
-    
+        // Redirect to the desired route
+        return back()
+            ->with('success', 'You have successfully upload image.');
+            // ->with('images', $images);
+    }
+
+    public function UpdateComplaint(Request $request, $id)
+    {
+
         $complaint = StudentCompl::findOrFail($id);
-    
+
         $test = $complaint->update([
             'description' => $request->description,
             'category_id' => $request->category_id,
         ]);
 
         // dd($test);
-    
+
         return redirect()->route('show.all.complaints');
     }
 

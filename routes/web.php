@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\StudentComplaintController;
 use App\Models\StudentCompl;
 
@@ -23,6 +24,9 @@ Route::get('/', function () {
 Route::group(['prefix'=> 'admin', 'middleware'=>['admin:admin']], function(){
 	Route::get('/login', [AdminController::class, 'loginForm']);
 	Route::post('/login',[AdminController::class, 'store'])->name('admin.login');
+
+
+
 });
 
 
@@ -36,6 +40,13 @@ Route::group(['prefix'=> 'student'], function(){
 
 
     Route::get('/open-tickets', [StudentComplaintController::class, 'open_tickets']);
+
+});
+
+
+Route::group(['prefix'=> 'admin'], function(){
+	Route::get('/all-complaints', [StudentComplaintController::class, 'AllComplaints'])->name('show.all.complaints');
+	Route::get('/all-admin-complaints', [AdminUserController::class, 'AllComplaints']);
 
 });
 
