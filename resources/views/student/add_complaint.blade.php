@@ -70,7 +70,7 @@
                             <label class="form-label" for="inputImage">Select Images:</label>
                             <input type="file" name="attachments[]" id="inputImage" multiple class="form-control @error('images') is-invalid @enderror">
 
-                            @error('images')
+                            @error('attachments')
                             <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>

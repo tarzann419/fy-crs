@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\AdminReceivedMail;
 use App\Mail\ComplaintSubmittedMail;
+use App\Models\Attachments;
 use App\Models\Category;
 use App\Models\StudentCompl;
 use Carbon\Carbon;
@@ -47,25 +48,18 @@ class StudentComplaintController extends Controller
             'created_at' => now(),
         ]);
 
-        // store images
-        $images = [];
-        if ($request->has('attachments')) {
-            foreach ($request->file('attachments') as $key => $attachment) {
-                $imageName = time() . rand(1, 99) . '.' . $attachment->extension();
-                $attachment->move(public_path('images'), $imageName);
+        $compl = new StudentCompl;
 
-                $images[]['attachments'] = $imageName;
 
-                // $images[] = ['attachments' => $imageName];
-            }
-
-            // assoc images with the complaint
-            foreach ($images as $key => $image) {
-                StudentCompl::create($image);
-            }
-            // $complaint->images()->createMany($images);
+        foreach ($request->file('attachments') as $imagefile) {
+            $image = new Attachments();
+            $path = $imagefile->store('/images/resource', ['disk' =>   'my_files']);
+            $image->url = $path;
+            $image->complaint_id = $complaint->id;
+            $image->save();
         }
-        dd($complaint);
+
+        // dd($complaint, $image);
 
         // data for email
         $data = [
@@ -85,7 +79,7 @@ class StudentComplaintController extends Controller
         // Redirect to the desired route
         return back()
             ->with('success', 'You have successfully upload image.');
-            // ->with('images', $images);
+        // ->with('images', $images);
     }
 
     public function UpdateComplaint(Request $request, $id)

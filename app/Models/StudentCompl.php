@@ -25,6 +25,11 @@ class StudentCompl extends Model
             ->get();
     }
 
+    public function images()
+    {
+        return $this->hasMany('App\Attachments', 'complaint_id');
+    }
+
     // generate a unique identifier before saving the complain
     protected static function boot()
     {
