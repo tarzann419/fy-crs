@@ -21,7 +21,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
                 @endif
-                
+
                 <div class="py-12">
                     @if(count($my_complaints) > 0)
                     <table class="min-w-full bg-white border border-gray-300">
@@ -39,9 +39,11 @@
                             <tr>
                                 <td class="py-2 px-4 border-b">
                                     @if($item->image)
-                                    <img src="{{ $item->image }}" alt="Complaint Image" class="max-w-full h-auto">
+                                        @foreach($item->attachments as $attachment)
+                                            <img src="{{ asset($attachment->url) }}" alt="Complaint Image" class="max-w-full h-auto">
+                                        @endforeach
                                     @else
-                                    <span>No Image</span>
+                                        <span>No Image</span>
                                     @endif
                                 </td>
                                 <td class="py-2 px-4 border-b">{{ $item->category->name }}</td>
@@ -102,5 +104,7 @@
             <!-- end of main area -->
         </div>
     </x-app-layout>
+    {!! $my_complaints->withQueryString()->links() !!}
+
 
 </body>

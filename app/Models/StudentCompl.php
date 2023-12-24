@@ -30,6 +30,11 @@ class StudentCompl extends Model
         return $this->hasMany('App\Attachments', 'complaint_id');
     }
 
+    public function attachments()
+    {
+        return $this->hasMany(Attachments::class, 'complaint_id');
+    }
+
     // generate a unique identifier before saving the complain
     protected static function boot()
     {

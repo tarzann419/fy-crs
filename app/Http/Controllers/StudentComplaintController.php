@@ -17,7 +17,9 @@ class StudentComplaintController extends Controller
 {
     public function AllComplaints()
     {
-        $my_complaints = StudentCompl::latest()->get()->where('user_id', Auth::user()->id);
+        $my_complaints = StudentCompl::where('user_id', Auth::user()->id)->latest()->paginate(5);
+
+        // $my_complaints = StudentCompl::latest()->get()->where('user_id', Auth::user()->id)->paginate(5);
         $category = Category::get();
 
         return view('student.all_complaints', compact('my_complaints', 'category'));
@@ -36,7 +38,7 @@ class StudentComplaintController extends Controller
             'description' => 'required|max:255',
             'date_of_occurence' => 'required|date',
             'category_id' => 'required',
-            // 'attachments.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'attachments.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
         // new complaint
@@ -53,7 +55,7 @@ class StudentComplaintController extends Controller
 
         foreach ($request->file('attachments') as $imagefile) {
             $image = new Attachments();
-            $path = $imagefile->store('/images/resource', ['disk' =>   'my_files']);
+            $path = $imagefile->store('/images/resource', ['disk' => 'my_files']);
             $image->url = $path;
             $image->complaint_id = $complaint->id;
             $image->save();
@@ -76,9 +78,8 @@ class StudentComplaintController extends Controller
         // confirmation email to user
         Mail::to(Auth::user()->email)->send(new ComplaintSubmittedMail($data));
 
-        // Redirect to the desired route
-        return back()
-            ->with('success', 'You have successfully upload image.');
+        // redirect to the desired route
+        return redirect()->route('show.all.complaints')->with('success', 'You have successfully submitted a complaint. Please constantly check you emails for further responses.');
         // ->with('images', $images);
     }
 
